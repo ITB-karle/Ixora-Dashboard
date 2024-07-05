@@ -73,9 +73,9 @@ import ArgonButton from "@/components/ArgonButton.vue";
                 Email
               </th>
               <th
-                class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2"
               >
-                Created At
+                Branch
               </th>
               <th
                 class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
@@ -111,8 +111,8 @@ import ArgonButton from "@/components/ArgonButton.vue";
                   {{ member.email }}
                 </p>
               </td>
-              <td class="align-middle text-center">
-                <span class="text-secondary text-xs font-weight-bold">{{ member.created_at }}</span>
+              <td class="align-middle">
+                <span class="text-secondary text-xs font-weight-bold">{{ member.branch }}</span>
               </td>
               <td class="align-middle text-center text-sm">
                 <span class="text-secondary text-xs font-weight-bold">{{ member.updated_at }}</span>

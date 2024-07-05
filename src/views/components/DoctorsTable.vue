@@ -75,7 +75,7 @@ import ArgonButton from "@/components/ArgonButton.vue";
                 Email
               </th>
               <th
-                class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
               >
                 Branch
               </th>
@@ -109,7 +109,7 @@ import ArgonButton from "@/components/ArgonButton.vue";
                   {{ doctor.email}}
                 </p>
               </td>
-              <td class="align-middle text-center">
+              <td class="align-middle">
                 <span class="text-secondary text-xs font-weight-bold"
                   >{{ doctor.branch }}</span
                 >

@@ -6,6 +6,8 @@ import ArgonInput from "@/components/ArgonInput.vue";
 // import ArgonSwitch from "@/components/ArgonSwitch.vue";
 import ArgonButton from "@/components/ArgonButton.vue";
 import { apiRequest } from '@/assets/js/apiRequest.js'; 
+import ErrorModal from "./components/ErrorModal.vue";
+import SuccessModal from "./components/SuccessModal.vue";
 
 import { ref } from 'vue';
 import { useRouter } from "vue-router";
@@ -27,6 +29,27 @@ onBeforeUnmount(() => {
   store.state.showFooter = true;
   body.classList.add("bg-gray-100");
 });
+
+
+const showErrorModal = ref(false);
+const showSuccessModal = ref(false);
+const errorMessage = ref('');
+const successMessage = ref('');
+
+const handleApiError = () => {
+  errorMessage.value = 'Username or Password Invalid';
+  showErrorModal.value = true;
+};
+
+const handleApiSuccess = (message) => {
+  successMessage.value = message || 'Operation completed successfully';
+  showSuccessModal.value = true;
+};
+
+const goListPage = () => {
+  showSuccessModal.value = false;
+  router.push('/account-management');
+};
 
 const username = ref('');
 const password = ref('');
@@ -54,10 +77,15 @@ const login = async () => {
     localStorage.setItem('authentication', true);
     // For demonstration, setting loggedIn to true
     
-    router.push('/account-management');
-  } catch (error) {
-    console.error('Login failed:', error);
-    // Handle login error
+
+    if (response.http_status < 300) {
+        handleApiSuccess('Login Successfully');
+      } else {
+        throw new Error(response.message);
+      }
+    }
+  catch (error) {
+    handleApiError(error);
   }
 };
 
@@ -118,6 +146,7 @@ const login = async () => {
                     <div class="text-center">
                       <argon-button
                         class="mt-4"
+                        type="submit"
                         variant="gradient"
                         color="danger"
                         fullWidth
@@ -150,7 +179,7 @@ const login = async () => {
                 "
               >
                 <span class="mask bg-gradient-danger opacity-6"></span>
-                <h4
+                <!-- <h4
                   class="mt-5 text-white font-weight-bolder position-relative"
                 >
                   "Attention is the new currency"
@@ -158,12 +187,14 @@ const login = async () => {
                 <p class="text-white position-relative">
                   The more effortless the writing looks, the more effort the
                   writer actually put into the process.
-                </p>
+                </p> -->
               </div>
             </div>
           </div>
         </div>
       </div>
     </section>
+    <error-modal :show-modal="showErrorModal" :error-message="errorMessage" @close="showErrorModal = false" />
+    <success-modal :show-modal="showSuccessModal" :success-message="successMessage" @close="goListPage" />
   </main>
 </template>

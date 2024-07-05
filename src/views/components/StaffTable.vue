@@ -73,7 +73,7 @@ import ArgonButton from "@/components/ArgonButton.vue";
                 Email
               </th>
               <th
-                class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
               >
                 Branch
               </th>
@@ -88,7 +88,7 @@ import ArgonButton from "@/components/ArgonButton.vue";
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(cs, index) in staffToDIsplay" :key="index">
+            <tr v-for="(staff, index) in staffToDIsplay" :key="index">
               <td>
                 <div class="d-flex px-2 py-1">
                   <div>
@@ -99,24 +99,24 @@ import ArgonButton from "@/components/ArgonButton.vue";
                     />
                   </div>
                   <div class="d-flex flex-column justify-content-center">
-                    <h6 class="mb-0 text-sm">{{ cs.name }}</h6>
+                    <h6 class="mb-0 text-sm">{{ staff.name }}</h6>
                   </div>
                 </div>
               </td>
               <td>
                 <p class="text-xs text-secondary mb-0">
-                  {{ cs.email }}
+                  {{ staff.email }}
                 </p>
               </td>
-              <td class="align-middle text-center">
-                <span class="text-secondary text-xs font-weight-bold">{{ cs.branch }}</span>
+              <td class="align-middle">
+                <span class="text-secondary text-xs font-weight-bold">{{ staff.branch }}</span>
               </td>
               <td class="align-middle text-center text-sm">
-                <span class="text-secondary text-xs font-weight-bold">{{ cs.updated_at }}</span>
+                <span class="text-secondary text-xs font-weight-bold">{{ staff.updated_at }}</span>
               </td>
               <td class="align-middle text-center">
                 <a
-                  :href="`edit-user/?uuid=${cs.uuid}`"
+                  :href="`edit-user/?uuid=${staff.uuid}`"
                   class="text-secondary font-weight-bold text-xs"
                   data-toggle="tooltip"
                   data-original-title="Edit user"

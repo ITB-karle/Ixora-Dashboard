@@ -25,6 +25,7 @@ const darkMode = computed(() => store.state.darkMode);
         layout === 'landing' ? 'bg-transparent shadow-none' : ' '
       } ${sidebarType}`"
     id="sidenav-main"
+    data-color="danger"
   >
     <div class="sidenav-header">
       <i

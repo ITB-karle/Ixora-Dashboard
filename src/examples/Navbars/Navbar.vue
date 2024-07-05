@@ -4,7 +4,7 @@ import { useStore } from "vuex";
 import { useRoute, useRouter } from "vue-router";
 import Breadcrumbs from "../Breadcrumbs.vue";
 
-const showMenu = ref(false);
+// const showMenu = ref(false);
 const store = useStore();
 const isRTL = computed(() => store.state.isRTL);
 
@@ -20,14 +20,14 @@ const currentDirectory = computed(() => {
   return dir.charAt(0).toUpperCase() + dir.slice(1);
 });
 
-const minimizeSidebar = () => store.commit("sidebarMinimize");
-const toggleConfigurator = () => store.commit("toggleConfigurator");
+// const minimizeSidebar = () => store.commit("sidebarMinimize");
+// const toggleConfigurator = () => store.commit("toggleConfigurator");
 
-const closeMenu = () => {
-  setTimeout(() => {
-    showMenu.value = false;
-  }, 100);
-};
+// const closeMenu = () => {
+//   setTimeout(() => {
+//     showMenu.value = false;
+//   }, 100);
+// };
 
 // Retrieve token from localStorage
 
@@ -85,17 +85,20 @@ if (userData == null) {
         </div>
         <ul class="navbar-nav justify-content-end">
           <li class="nav-item d-flex align-items-center">
-            <router-link
+            <!-- <router-link
               :to="{ name: 'Signin' }"
               class="px-0 nav-link font-weight-bold text-white"
               target="_blank"
             >
               <i class="fa fa-user" :class="isRTL ? 'ms-sm-2' : 'me-sm-2'"></i>    
               <span class="d-sm-inline d-none">{{userName}}</span>
-            </router-link>
-            
+            </router-link> -->
+            <div class="font-weight-bold text-white">
+              <i class="fa fa-user" :class="isRTL ? 'ms-sm-2' : 'me-sm-2'"></i> 
+              <span>{{ userName }}</span>
+            </div>        
           </li>
-          <li class="nav-item d-xl-none ps-3 d-flex align-items-center">
+          <!-- <li class="nav-item d-xl-none ps-3 d-flex align-items-center">
             <a
               href="#"
               @click="minimizeSidebar"
@@ -113,8 +116,8 @@ if (userData == null) {
             <a class="p-0 nav-link text-white" @click="toggleConfigurator">
               <i class="cursor-pointer fa fa-cog fixed-plugin-button-nav"></i>
             </a>
-          </li>
-          <li
+          </li> -->
+          <!-- <li
             class="nav-item dropdown d-flex align-items-center"
             :class="isRTL ? 'ps-2' : 'pe-2'"
           >
@@ -237,7 +240,7 @@ if (userData == null) {
                 </a>
               </li>
             </ul>
-          </li>
+          </li> -->
         </ul>
       </div>
     </div>
