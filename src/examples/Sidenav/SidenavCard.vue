@@ -91,7 +91,7 @@ const logout = async () => {
     </a> -->
 
     <a
-      class="mt-8 mb-3 btn btn-danger btn-sm w-100"
+      class="btn btn-danger btn-sm w-100"
       @click="logout"
     >
       Logout
