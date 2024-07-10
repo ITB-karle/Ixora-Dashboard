@@ -57,7 +57,7 @@ if (userData == null) {
     id="navbarBlur"
     data-scroll="true"
   >
-    <div class="px-3 py-1 container-fluid">
+    <div class="px-0 px-md-3 py-1 container-fluid">
       <breadcrumbs
         :current-page="currentRouteName"
         :current-directory="currentDirectory"
