@@ -44,16 +44,16 @@ const changeToHelpdesk = () => {
     </div>
 
     <div class="row">
-      <div class="col-3 my-3">
+      <div class="col-6 col-md-3 my-3">
         <button class="btn w-100" :class="{ 'btn-light': activeButton !== 'members', 'btn-dark': activeButton === 'members' }" @click="changeToMembers">Members</button>
       </div>
-      <div class="col-3 my-3">
+      <div class="col-6 col-md-3 my-3">
         <button class="btn w-100" :class="{ 'btn-light': activeButton !== 'doctors', 'btn-dark': activeButton === 'doctors' }" @click="changeToDoctors">Medical</button>
       </div>
-      <div class="col-3 my-3">
+      <div class="col-6 col-md-3 my-3">
         <button class="btn w-100" :class="{ 'btn-light': activeButton !== 'cs', 'btn-dark': activeButton === 'cs' }" @click="changeToCs">Staff</button>
       </div>
-      <div class="col-3 my-3">
+      <div class="col-6 col-md-3 my-3">
         <button class="btn w-100" :class="{ 'btn-light': activeButton !== 'helpdesk', 'btn-dark': activeButton === 'helpdesk' }" @click="changeToHelpdesk">Helpdesk</button>
       </div>
       <div v-if="displayTable === 'members'" class="mb-5">

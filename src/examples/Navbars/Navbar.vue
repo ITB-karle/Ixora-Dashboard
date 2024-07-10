@@ -20,7 +20,7 @@ const currentDirectory = computed(() => {
   return dir.charAt(0).toUpperCase() + dir.slice(1);
 });
 
-// const minimizeSidebar = () => store.commit("sidebarMinimize");
+const minimizeSidebar = () => store.commit("sidebarMinimize");
 // const toggleConfigurator = () => store.commit("toggleConfigurator");
 
 // const closeMenu = () => {
@@ -98,7 +98,7 @@ if (userData == null) {
               <span>{{ userName }}</span>
             </div>        
           </li>
-          <!-- <li class="nav-item d-xl-none ps-3 d-flex align-items-center">
+          <li class="nav-item d-xl-none ps-3 d-flex align-items-center">
             <a
               href="#"
               @click="minimizeSidebar"
@@ -112,7 +112,7 @@ if (userData == null) {
               </div>
             </a>
           </li>
-          <li class="px-3 nav-item d-flex align-items-center">
+          <!-- <li class="px-3 nav-item d-flex align-items-center">
             <a class="p-0 nav-link text-white" @click="toggleConfigurator">
               <i class="cursor-pointer fa fa-cog fixed-plugin-button-nav"></i>
             </a>
