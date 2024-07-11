@@ -158,7 +158,7 @@ const pushNotification = async () => {
         <span class="mask bg-gradient-success opacity-6"></span>
       </div>
     </div>
-    <div class="py-4 container-fluid shadow-lg mt-n6">
+    <div class="py-4 container-fluid mt-n6">
       <div class="row">
         <div class="col-md-12">
           <form class="card" @submit.prevent="pushNotification">
