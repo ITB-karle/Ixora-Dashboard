@@ -1,11 +1,8 @@
 <script setup>
-import { onBeforeMount, onMounted, onBeforeUnmount, ref, computed } from "vue";
-import { useStore } from "vuex";
+import { onMounted, ref, computed } from "vue";
 import { apiRequest } from '@/assets/js/apiRequest.js';
 import { useRouter } from 'vue-router';
 
-import setNavPills from "@/assets/js/nav-pills.js";
-import setTooltip from "@/assets/js/tooltip.js";
 import ArgonInput from "@/components/ArgonInput.vue";
 import ArgonTextarea from "@/components/ArgonTextarea.vue";
 import ArgonButton from "@/components/ArgonButton.vue";
@@ -15,37 +12,18 @@ import Multiselect from 'vue-multiselect';
 import ErrorModal from "./components/ErrorModal.vue";
 import SuccessModal from "./components/SuccessModal.vue";
 
-const body = document.getElementsByTagName("body")[0];
 
-const store = useStore();
+
 const router = useRouter();
 var is_All = ref(true);
 const selectUser = ref([]);
 // const options = ref([]);    
 
 onMounted(() => {
-  store.state.isAbsolute = true;
-  setNavPills();
-  setTooltip();
   getMemberList();
 });
 
-onBeforeMount(() => {
-  store.state.imageLayout = "profile-overview";
-  store.state.showNavbar = false;
-  store.state.showFooter = true;
-  store.state.hideConfigButton = true;
-  body.classList.add("profile-overview");
-});
 
-onBeforeUnmount(() => {
-  store.state.isAbsolute = false;
-  store.state.imageLayout = "default";
-  store.state.showNavbar = true;
-  store.state.showFooter = true;
-  store.state.hideConfigButton = false;
-  body.classList.remove("profile-overview");
-});
 
 const showErrorModal = ref(false);
 const showSuccessModal = ref(false);
@@ -145,26 +123,14 @@ const pushNotification = async () => {
 
 </script>
 <template>
-  <main>
-    <div class="container-fluid">
-      <div
-        class="page-header min-height-300"
-        style="
-          background-image: url(&quot;https://images.unsplash.com/photo-1531512073830-ba890ca4eba2?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80&quot;);
-          margin-right: -24px;
-          margin-left: -34%;
-        "
-      >
-        <span class="mask bg-gradient-success opacity-6"></span>
-      </div>
-    </div>
-    <div class="py-4 container-fluid mt-n6">
+  <main class="container-fluid">
+    <div class="py-4 container-fluid">
       <div class="row">
         <div class="col-md-12">
           <form class="card" @submit.prevent="pushNotification">
             <div class="card-header pb-0">
               <div class="d-flex align-items-center">
-                 <p class="mb-0 text-primary font-weight-bolder">Push Notification</p>
+                <p class="mb-0 text-primary font-weight-bolder">Push Notification</p>
                 <argon-button color="success" size="sm" class="ms-auto">
                   Push
                 </argon-button>

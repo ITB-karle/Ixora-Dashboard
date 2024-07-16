@@ -14,7 +14,7 @@ const layout = computed(() => store.state.layout);
 defineProps({
   card: {
     type: Object,
-    required: true,
+    required: false,
     title: String,
     description: String,
     links: {
@@ -68,8 +68,8 @@ const logout = async () => {
     class="card card-plain shadow-none"
     id="sidenavCard"
   >
-    <!-- <div class="p-3 card-body text-center w-100 pt-0">
-      <img
+    <div class="p-3 card-body text-center w-100 pt-0">
+      <!-- <img
         class="w-50 mx-auto"
         src="@/assets/img/illustrations/icon-documentation.svg"
         alt="sidebar_illustration"
@@ -79,10 +79,10 @@ const logout = async () => {
 
 
 
-      <p class="text-xs font-weight-bold">Please check our docs</p>
+      <p class="text-xs font-weight-bold">Please check our docs</p> -->
     </div>
 
-    <a
+    <!-- <a
       href="https://www.creative-tim.com/learning-lab/vue/overview/argon-dashboard/"
       target="_blank"
       class="mb-3 btn btn-dark btn-sm w-100"
@@ -91,7 +91,7 @@ const logout = async () => {
     </a> -->
 
     <a
-      class="btn btn-danger btn-sm w-100"
+      class="btn btn-danger btn-sm w-100 "
       @click="logout"
     >
       Logout

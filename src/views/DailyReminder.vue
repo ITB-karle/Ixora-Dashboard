@@ -118,7 +118,6 @@ const completeTask = async () => {
       <div class="text-center my-4">
         <div>
           <argon-button color="primary" @click="changeDate(-1)">Prev</argon-button>
-          <argon-input type="date" v-model="form.date_of_birth" />
           <input class="dateInput" type="date" v-model="formattedDateInput" @input="updateDate" />
           <argon-button color="primary" @click="changeDate(1)">Next</argon-button>
         </div>

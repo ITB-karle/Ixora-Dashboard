@@ -1,25 +1,16 @@
 <script setup>
-import { onBeforeMount, onMounted, onBeforeUnmount, ref, computed } from "vue";
-import { useStore } from "vuex";
+import { onMounted, ref, computed } from "vue";
 import { useRouter } from 'vue-router';
 import { apiRequest } from '@/assets/js/apiRequest.js'; 
 
-import setNavPills from "@/assets/js/nav-pills.js";
-import setTooltip from "@/assets/js/tooltip.js";
 import ArgonButton from "@/components/ArgonButton.vue";
 
 import DeleteModal from "./components/DeleteModal.vue";
 
-
-const body = document.getElementsByTagName("body")[0];
-
-const store = useStore();
 const router = useRouter();
 
 onMounted(() => {
-  store.state.isAbsolute = true;
-  setNavPills();
-  setTooltip();
+
   getForumList();
   // Extract the UUID from the URL query parameters
   // const urlParams = new URLSearchParams(window.location.search);
@@ -33,21 +24,7 @@ onMounted(() => {
   // };
 
 });
-onBeforeMount(() => {
-  store.state.imageLayout = "profile-overview";
-  store.state.showNavbar = false;
-  store.state.showFooter = true;
-  store.state.hideConfigButton = true;
-  body.classList.add("profile-overview");
-});
-onBeforeUnmount(() => {
-  store.state.isAbsolute = false;
-  store.state.imageLayout = "default";
-  store.state.showNavbar = true;
-  store.state.showFooter = true;
-  store.state.hideConfigButton = false;
-  body.classList.remove("profile-overview");
-});
+
 
 const showDeleteModal = ref(false);
 const deleteMessage = ref("Do you want to delete this forum?")
@@ -127,22 +104,10 @@ const prevPage = () => {
 
 </script>
 <template>
-  <main>
-    <div class="container-fluid">
-      <div
-        class="page-header min-height-300"
-        style="
-          background-image: url(&quot;https://images.unsplash.com/photo-1531512073830-ba890ca4eba2?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80&quot;);
-          margin-right: -24px;
-          margin-left: -34%;
-        "
-      >
-        <span class="mask bg-gradient-warning opacity-6"></span>
-      </div>
-    </div>
+  <main class="container-fluid">
     <div class="py-4 container-fluid">
       <div class="row">
-        <div class="col-md-12 mt-n5">
+        <div class="col-md-12">
           <div class="card">
             <div class="card-header pb-0">
               <div class="d-flex align-items-center justify-content-between">

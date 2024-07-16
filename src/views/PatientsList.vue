@@ -6,7 +6,7 @@ import PatientsTable from "./components/PatientsTable.vue";
 
 </script>
 <template>
-  <div class="container-fluid">
+  <div class="container-fluid mt-6">
     <!-- <div class="text-end mt-5 mb-3">
       <router-link :to="{ name: 'Create User' }">
         <argon-button color="warning" variant="gradient">
