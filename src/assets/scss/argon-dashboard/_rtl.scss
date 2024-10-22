@@ -112,3 +112,8 @@
     }
   }
 }
+
+.input-group > :not(:first-child):not(.dropdown-menu):not(.valid-tooltip):not(.valid-feedback):not(.invalid-tooltip):not(.invalid-feedback) {
+  border-left: 1px solid #d2d6da !important;
+  border-right: 1px solid #d2d6da !important;
+}

@@ -82,10 +82,12 @@ const form = ref({});
 const createVitalSign = async () => {
   const data = {
     patient_uuid: form.value.patient_uuid,
-    blood_pressure: form.value.blood_pressure,
+    blood_pressure_diastolic: form.value.blood_pressure_diastolic,
+    blood_pressure_systolic: form.value.blood_pressure_systolic,
     spo2: form.value.spo2,
     pulse_rate: form.value.pulse_rate,
-    blood_glucose_level: form.value.blood_glucose_level,
+    blood_glucose_level_before: form.value.blood_glucose_level_before,
+    blood_glucose_level_after: form.value.blood_glucose_level_after,
     remark: form.value.remark,
   };
     
@@ -138,32 +140,62 @@ const createVitalSign = async () => {
                   >
                   <argon-input type="text" v-model="form.patient_uuid" disabled />
                 </div>
-                <div class="col-md-6">
+                <div class="form-group col-md-3">
                   <label for="example-text-input" class="form-control-label"
-                    >Blood Pressure</label
+                    >Blood Pressure Diastolic</label
                   >
-                  <argon-input type="number" v-model="form.blood_pressure" required />
+                  <div class="input-group">
+                    <input v-model="form.blood_pressure_diastolic" type="number" class="form-control" aria-describedby="basic-addon2">
+                    <span class="input-group-text border" id="basic-addon2">mmHg</span>
+                  </div>
                 </div>
-                <div class="col-md-6">
+                <div class="form-group col-md-3">
+                  <label for="example-text-input" class="form-control-label"
+                    >Blood Pressure Systolic</label
+                  >
+                  <div class="input-group">
+                    <input v-model="form.blood_pressure_systolic" type="number" class="form-control" aria-describedby="basic-addon2">
+                    <span class="input-group-text border" id="basic-addon2">mmHg</span>
+                  </div>
+                </div>
+                <div class="form-group col-md-3">
                   <label for="example-text-input" class="form-control-label"
                     >SPO2</label
                   >
-                  <argon-input type="number" v-model="form.spo2" required />
+                  <div class="input-group">
+                    <input v-model="form.spo2" type="number" class="form-control" aria-describedby="basic-addon2">
+                    <span class="input-group-text border" id="basic-addon2">%</span>
+                  </div>
                 </div>
-                <div class="col-md-6">
+                <div class="form-group col-md-3">
                   <label for="example-text-input" class="form-control-label"
-                    >pulse_rate</label
+                    >Pulse Rate</label
                   >
-                  <argon-input type="number" v-model="form.pulse_rate" required />
+                  <div class="input-group">
+                    <input v-model="form.pulse_rate" type="number" class="form-control" aria-describedby="basic-addon2">
+                    <span class="input-group-text border" id="basic-addon2">bpm</span>
+                  </div>
                 </div>
-                <div class="col-md-6">
+                <div class="form-group col-md-3">
                   <label for="example-text-input" class="form-control-label"
-                    >Blood Glucose Level</label
+                    >Blood Glucose Level (Before Eat)</label
                   >
-                  <argon-input type="number" v-model="form.blood_glucose_level" required />
+                  <div class="input-group">
+                    <input v-model="form.blood_glucose_level_before" type="number" class="form-control" aria-describedby="basic-addon2">
+                    <span class="input-group-text border" id="basic-addon2">mmol/L</span>
+                  </div>
+                </div>
+                <div class="form-group col-md-3">
+                  <label for="example-text-input" class="form-control-label"
+                    >Blood Glucose Level (After Eat)</label
+                  >
+                  <div class="input-group">
+                    <input v-model="form.blood_glucose_level_after" type="number" class="form-control" aria-describedby="basic-addon2">
+                    <span class="input-group-text border" id="basic-addon2">mmol/L</span>
+                  </div>
                 </div>
                 <div class="col-md-6">
-                  <argon-textarea :rows="8" type="text" v-model:title="form.remark" required>
+                  <argon-textarea :rows="8" type="text" v-model:title="form.remark">
                     Remark
                   </argon-textarea>
                 </div>

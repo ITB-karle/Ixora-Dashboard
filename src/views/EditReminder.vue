@@ -9,6 +9,7 @@ import setTooltip from "@/assets/js/tooltip.js";
 import ArgonInput from "@/components/ArgonInput.vue";
 import ArgonButton from "@/components/ArgonButton.vue";
 import ArgonTextarea from "@/components/ArgonTextarea.vue";
+import ArgonSwitch from "@/components/ArgonSwitch.vue";  
 import BackButton from "./components/BackButton.vue";
 
 import ErrorModal from "./components/ErrorModal.vue";
@@ -86,6 +87,11 @@ const getReminderDetails = async (uuid) => {
     const response = await apiRequest(`https://staging.itbrightsolution.com/ixora_backend/public/api/v1/patient_reminder/${ uuid }/edit`);
     reminder.value = response.data;
     form.value = { ...response.data };
+
+    if (typeof form.value.repeat === 'boolean') {
+      form.value.repeat = form.value.repeat ? 1 : 0;
+    }
+
   } catch (error) {
     console.error('Get Data Failed:', error);
     // Handle login error
@@ -99,6 +105,7 @@ const updateReminder = async () => {
     reminder: form.value.reminder,
     date_replaced: form.value.date_replaced,
     frequency_weeks: form.value.frequency_weeks,
+    repeat: form.value.repeat,
   };
     
   try {
@@ -113,7 +120,10 @@ const updateReminder = async () => {
   }
 };
 
-
+// Function to toggle between 0 and 1
+const toggleRepeat = (event) => {
+  form.value.repeat = event.target.checked ? 1 : 0;
+};
 
 </script>
 <template>
@@ -168,6 +178,13 @@ const updateReminder = async () => {
                   <argon-textarea :rows="8" type="text" v-model:title="form.reminder" required>
                     Reminder
                   </argon-textarea>
+                </div>
+                <div class="col-md-6">
+                  <label for="example-text-input" class="form-control-label"
+                    >Repeat</label
+                  >
+                  <argon-switch id="repeat" name="Repeat" :checked="form.repeat === 1" @change="toggleRepeat">
+                  </argon-switch>
                 </div>
               </div>
             </div>

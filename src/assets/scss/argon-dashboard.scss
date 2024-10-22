@@ -28,3 +28,15 @@
 
 // Custom Variables
 @import "argon-dashboard/custom/styles";
+
+
+.printTable {
+  font-size: 11px;
+  width: 100%;
+  text-align: center;
+
+  tr th, td {
+    border: 1px solid black;
+    padding: 2px 5px;
+  }
+}

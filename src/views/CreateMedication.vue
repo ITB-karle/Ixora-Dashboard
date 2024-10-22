@@ -6,6 +6,7 @@ import { apiRequest } from '@/assets/js/apiRequest.js';
 
 import setNavPills from "@/assets/js/nav-pills.js";
 import setTooltip from "@/assets/js/tooltip.js";
+import ArgonTextarea from "@/components/ArgonTextarea.vue";
 import ArgonInput from "@/components/ArgonInput.vue";
 import ArgonButton from "@/components/ArgonButton.vue";
 import BackButton from "./components/BackButton.vue";
@@ -17,6 +18,42 @@ const body = document.getElementsByTagName("body")[0];
 
 const store = useStore();
 const router = useRouter();
+
+const medicine_time = ref([
+  {
+    uuid: 1,
+    name: "7:00 AM - 10:00 AM",
+  },
+  {
+    uuid: 2,
+    name: "10:00 AM - 1:00 PM",
+  },
+  {
+    uuid: 3,
+    name: "1:00 PM - 4:00 PM",
+  },
+  {
+    uuid: 4,
+    name: "4:00 PM - 7:00 PM",
+  },
+  {
+    uuid: 5,
+    name: "7:00 PM - 10:00 PM",
+  },
+  {
+    uuid: 6,
+    name: "10:00 PM - 1:00 AM",
+  },
+  {
+    uuid: 7,
+    name: "1:00 AM - 4:00 AM",
+  },
+  {
+    uuid: 8,
+    name: "4:00 AM - 7:00 AM",
+  }
+]);
+
 
 onMounted(() => {
   store.state.isAbsolute = true;
@@ -76,8 +113,17 @@ const goListPage = () => {
 
 const form = ref({
   restock_amount: '0',
+  restock_date: new Date().toISOString().split('T')[0],
   record_type: '',
 });
+
+const remark = ref(
+  {
+    remark: "",
+    time: "",
+    before_after: "",
+  }
+);
 
 const createMedication = async () => {
   const data = {
@@ -88,6 +134,12 @@ const createMedication = async () => {
     inventory: form.value.inventory,
     dosing: form.value.dosing,
     frequency: form.value.frequency,
+    routine: form.value.routine,
+    remark: JSON.stringify({
+      remark: remark.value.remark,
+      before_after: remark.value.before_after, // Assuming these are part of the form
+      time: remark.value.time, // Assuming time is the selected time
+    }),
     restock_amount: form.value.restock_amount,
     record_type: form.value.record_type,
   };
@@ -162,12 +214,6 @@ const createMedication = async () => {
                 </div>
                 <div class="col-md-6">
                   <label for="example-text-input" class="form-control-label"
-                    >Restock Date</label
-                  >
-                  <input class="form-control" type="date" v-model="form.restock_date" required />
-                </div>
-                <div class="col-md-6">
-                  <label for="example-text-input" class="form-control-label"
                     >Inventory</label
                   >
                   <argon-input type="number" v-model="form.inventory" required />
@@ -176,20 +222,14 @@ const createMedication = async () => {
                   <label for="example-text-input" class="form-control-label"
                     >dosing</label
                   >
-                  <argon-input type="number" v-model="form.dosing" required />
+                  <input type="number" class="form-control form-control-default" step="0.01" min="0" max="10" v-model="form.dosing" required />
                 </div>
                 <div class="col-md-6">
                   <label for="example-text-input" class="form-control-label"
                     >Frequency</label
                   >
                   <argon-input type="number" v-model="form.frequency" required />
-                </div>
-                <div class="col-md-6">
-                  <label for="example-text-input" class="form-control-label"
-                    >Restock Amount</label
-                  >
-                  <argon-input type="number" v-model="form.restock_amount" required />
-                </div>
+                </div>   
                 <div class="col-md-6">
                   <label for="example-text-input" class="form-control-label"
                     >Record Type</label
@@ -199,6 +239,51 @@ const createMedication = async () => {
                     <option :value="1">Permanent</option>
                     <option :value="2">Temporary</option>
                   </select>
+                </div>
+                <div class="col-md-6">
+                  <label for="example-text-input" class="form-control-label"
+                    >Routine</label
+                  >
+                  <argon-input type="number" v-model="form.routine" required />
+                </div>
+                <div class="col-md-6">
+                  <label for="example-text-input" class="form-control-label"
+                    >Before/After Meal</label
+                  >
+                  <select class="form-select" v-model="remark.before_after" aria-label="Default select example">
+                    <option value="Before Meal">Before Meal</option>
+                    <option value="After Meal">After Meal</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label for="example-text-input" class="form-control-label"
+                    >Time</label
+                  >
+                  <select class="form-select" v-model="remark.time" aria-label="Default select example">
+                    <option disabled value="">Select a time</option>
+                    <option v-for="time in medicine_time" :key="time.uuid" :value="time.name">
+                      {{ time.name }}
+                    </option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <argon-textarea :rows="8" type="text" v-model:title="remark.remark">
+                    Remark
+                  </argon-textarea>
+                </div>
+
+                <p class="mt-5 text-uppercase text-sm">Restock Information</p>
+                <div class="col-md-3">
+                  <label for="example-text-input" class="form-control-label"
+                    >Restock Date</label
+                  >
+                  <input class="form-control" type="date" v-model="form.restock_date" required />
+                </div>
+                <div class="col-md-3">
+                  <label for="example-text-input" class="form-control-label"
+                    >Restock Amount</label
+                  >
+                  <argon-input type="number" v-model="form.restock_amount" required />
                 </div>
               </div>
             </div>

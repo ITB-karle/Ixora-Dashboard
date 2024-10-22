@@ -94,9 +94,23 @@ const getBranchList = async () => {
 const form = ref({
     username: '',
     name: '',
+    emergency_contact: [
+      { phone: '' },
+      { phone: '' },
+      { phone: '' }
+    ],
+    emergency_name: [
+      { phone: '' },
+      { phone: '' },
+      { phone: '' }
+    ]
 });
 
 const submitForm = async () => {
+  const payload = {
+    emergency_contact: form.value.emergency_contact.map(contact => contact.phone).join(','),
+    emergency_name: form.value.emergency_name.map(name => name.phone).join(',')
+  };
   const data = {
     user_uuid: form.value.user_uuid,
     // username: form.value.username,
@@ -106,7 +120,8 @@ const submitForm = async () => {
     ic_number: form.value.ic_number,
     gender: form.value.gender,
     home_address: form.value.home_address,
-    emergency_contact: form.value.emergency_contact,
+    emergency_contact: payload.emergency_contact,
+    emergency_name: payload.emergency_name,
     image: form.value.image,
   };
     
@@ -192,7 +207,7 @@ const submitForm = async () => {
                   <label for="example-text-input" class="form-control-label"
                     >IC Number</label
                   >
-                  <argon-input type="text" v-model="form.ic_number" required/>
+                  <argon-input type="number" v-model="form.ic_number" required/>
                 </div>
                 <div class="col-md-6">
                   <label for="example-text-input" class="form-control-label"
@@ -209,15 +224,21 @@ const submitForm = async () => {
                     Address
                   </argon-textarea>
                 </div>
-                <div class="col-md-3">
-                  <label for="example-text-input" class="form-control-label"
-                    >Emergency Contact</label
-                  >
-                  <argon-input type="text" v-model="form.emergency_contact" required/>
-                  <label for="">Emergency Contact 2 (Optional)</label>
-                  <argon-input type="text" v-model="form.emergency_contact" />
-                  <label for="">Emergency Contact 3 (Optional)</label>
-                  <argon-input type="text" v-model="form.emergency_contact" />
+                <div class="col-md-3" >
+                  <div v-for="(name, index) in form.emergency_name" :key="index">
+                    <label :for="`emergency-name-${index}`" class="form-control-label">
+                      Emergency Contact Name {{ index + 1 }}{{ index === 0 ? '' : ' (Optional)' }}
+                    </label>
+                    <argon-input type="text" v-model="name.phone" required/>
+                  </div>
+                </div>
+                <div class="col-md-3" >
+                  <div v-for="(contact, index) in form.emergency_contact" :key="index">
+                    <label :for="`emergency-contact-${index}`" class="form-control-label">
+                      Emergency Contact {{ index + 1 }}{{ index === 0 ? '' : ' (Optional)' }}
+                    </label>
+                    <argon-input type="number" v-model="contact.phone" required/>
+                  </div>
                 </div>
               </div>
               <hr class="horizontal dark" />

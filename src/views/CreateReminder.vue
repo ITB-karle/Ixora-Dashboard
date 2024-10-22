@@ -9,6 +9,7 @@ import setTooltip from "@/assets/js/tooltip.js";
 import ArgonInput from "@/components/ArgonInput.vue";
 import ArgonButton from "@/components/ArgonButton.vue";
 import ArgonTextarea from "@/components/ArgonTextarea.vue";
+import ArgonSwitch from "@/components/ArgonSwitch.vue";  
 import BackButton from "./components/BackButton.vue";
 
 import ErrorModal from "./components/ErrorModal.vue";
@@ -76,7 +77,9 @@ const goListPage = () => {
   router.push(`../edit-patient/?uuid=${form.value.patient_uuid}`);
 };
 
-const form = ref({});
+const form = ref({
+  repeat: 0, // Initially set to 0 (off)
+});
 
 const createReminder = async () => {
   const data = {
@@ -84,6 +87,7 @@ const createReminder = async () => {
     reminder: form.value.reminder,
     date_replaced: form.value.date_replaced,
     frequency_weeks: form.value.frequency_weeks,
+    repeat: form.value.repeat,
   };
     
   try {
@@ -98,6 +102,10 @@ const createReminder = async () => {
   }
 };
 
+// Function to toggle between 0 and 1
+const toggleRepeat = (event) => {
+  form.value.repeat = event.target.checked ? 1 : 0;
+};
 
 
 </script>
@@ -153,6 +161,13 @@ const createReminder = async () => {
                   <argon-textarea :rows="8" type="text" v-model:title="form.reminder" required>
                     Reminder
                   </argon-textarea>
+                </div>
+                <div class="col-md-6">
+                  <label for="example-text-input" class="form-control-label"
+                    >Repeat</label
+                  >
+                  <argon-switch id="repeat" name="Repeat" :checked="form.repeat === 1" @change="toggleRepeat">
+                  </argon-switch>
                 </div>
               </div>
             </div>

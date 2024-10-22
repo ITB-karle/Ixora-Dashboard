@@ -12,6 +12,7 @@ import ArgonButton from "@/components/ArgonButton.vue";
 import ArgonTextarea from "@/components/ArgonTextarea.vue";
 import ArgonSwitch from "@/components/ArgonSwitch.vue";
 import FileInput from"@/components/FileInput.vue";
+import Multiselect from 'vue-multiselect';
 
 import ErrorModal from "./components/ErrorModal.vue";
 import SuccessModal from "./components/SuccessModal.vue";
@@ -21,6 +22,8 @@ const body = document.getElementsByTagName("body")[0];
 
 const store = useStore();
 const router = useRouter();
+const selectUser = ref([]);
+const options = ref([]);  
 
 onMounted(() => {
   store.state.isAbsolute = true;
@@ -35,6 +38,7 @@ onMounted(() => {
     getPatientDetails(patient_uuid);
     getMedicationList(patient_uuid);
     getVitalSignsList(patient_uuid);
+    fetchFamilyMembers(patient_uuid);
   } else {
       console.error('UUID not found in URL query parameters');
       // Handle error
@@ -178,9 +182,33 @@ const deleteData = async (deleteDataID, deleteType) => {
   
 };
 
+const assignFamily = async () => {
+  const familyUserUuids = selectUser.value.map(user => user.uuid);
+
+  const data = {
+    uuid: form.value.uuid,
+    family_user_uuids: familyUserUuids,
+  };
+  console.log('Assigned data:', data);
+  try {
+    const response = await apiRequest(`https://staging.itbrightsolution.com/ixora_backend/public/api/v1/patient/assign_family_members`,
+    data);
+    console.log('Assigned data:', data);
+    if (response.http_status < 300) {
+      handleApiSuccess('User Profile Updated Successfully');
+      console.log(data);
+    } else {
+      throw new Error(response.message);
+    }
+  } catch (error) {
+    handleApiError(error);
+  }
+}
+
 const updateProfile = async () => {
   const payload = {
-    emergency_contact: form.value.emergency_contact.map(contact => contact.phone).join(',')
+    emergency_contact: form.value.emergency_contact.map(contact => contact.phone).join(','),
+    emergency_name: form.value.emergency_name.map(name => name.phone).join(',')
   };
 
   const data = {
@@ -191,6 +219,7 @@ const updateProfile = async () => {
     gender: form.value.gender,
     home_address: form.value.home_address,
     emergency_contact: payload.emergency_contact,
+    emergency_name: payload.emergency_name,
   };
   console.log(payload.emergency_contact);
   console.log(data);
@@ -236,6 +265,11 @@ const form = ref({
     { phone: '' },
     { phone: '' },
     { phone: '' }
+  ],
+  emergency_name: [
+    { phone: '' },
+    { phone: '' },
+    { phone: '' }
   ]
 });
 const reminders = ref([]);
@@ -248,9 +282,11 @@ const getPatientDetails = async (patient_uuid) => {
     // Example using axios:
     const response = await apiRequest(`https://staging.itbrightsolution.com/ixora_backend/public/api/v1/patient/${ patient_uuid }/show`);
     patientProfile.value = response.data.profile;
-    const { emergency_contact, gender, ...profileData} = { ...response.data.profile }
+    const { emergency_contact, emergency_name, gender, ...profileData} = { ...response.data.profile }
     const emergencyContactObjects = emergency_contact.map(contact => ({ phone: contact }));
-    form.value = { ...profileData, gender: gender == 'male' ? 1 : 2, emergency_contact: emergencyContactObjects  };
+    const emergencyNameObjects = emergency_name.map(name => ({ phone: name }));
+    form.value = { ...profileData, gender: gender == 'male' ? 1 : 2, emergency_contact: emergencyContactObjects, emergency_name: emergencyNameObjects };
+    // selectUser.value = patientProfile.value.family_members;
     // medicationRecords.value = response.data.medication_records;
     reminders.value = response.data.reminders;
     introduction.value = response.data.introductions;
@@ -263,12 +299,70 @@ const getPatientDetails = async (patient_uuid) => {
 
 const medicationRecords = ref([]);
 const mrTemporary = ref([]);
+// const remark = ref(
+//   {
+//     remark: "",
+//     time: "",
+//     before_after: "",
+//   }
+// );
+
+const formatDate = (datetime) => {
+  return datetime.split(' ')[0]; // Just extract the date part, e.g., '2024-10-16'
+};
+
+// Helper function to get unit label
+const getUnitLabel = (unitValue) => {
+  switch(unitValue) {
+    case 1:
+      return 'tablet';   // Unit is 'tablet'
+    case 2:
+      return 'capsule';       // Unit is 'mL'
+    case 3:
+      return 'mL';       // Unit is 'mg'
+    default:
+      return 'unit';         // No unit for other values
+  }
+};
 
 const getMedicationList = async (patient_uuid) => {
   try {
     const response = await apiRequest(`https://staging.itbrightsolution.com/ixora_backend/public/api/v1/patient_medication_record/${ patient_uuid }/list`);
-    medicationRecords.value = response.data.permanent;
-    mrTemporary.value = response.data.temporary;
+
+    // Format the 'updated_at' date and handle unit label for each medication record
+    medicationRecords.value = response.data.permanent.map(record => ({
+      ...record,
+      updated_at: formatDate(record.updated_at),  // Apply formatting to 'updated_at'
+      unitLabel: getUnitLabel(record.unit),  // Add 'mL' if unit.value equals 1
+    
+      // Parse 'remark' for each record
+      remark: (() => {
+        try {
+          return JSON.parse(record.remark) ?? { remark: "", time: "", before_after: "" };
+        } catch (error) {
+          console.error('Error parsing remark for permanent record:', error);
+          return { remark: "", time: "", before_after: "" };  // Default structure
+        }
+      })(),
+    }));
+
+    mrTemporary.value = response.data.temporary.map(record => ({
+      ...record,
+      updated_at: formatDate(record.updated_at),  // Apply formatting to 'updated_at'
+      unitLabel: getUnitLabel(record.unit),  // Add 'mL' if unit.value equals 1
+      
+      // Parse 'remark' for each record
+      remark: (() => {
+        try {
+          return JSON.parse(record.remark) ?? { remark: "", time: "", before_after: "" };
+        } catch (error) {
+          console.error('Error parsing remark for permanent record:', error);
+          return { remark: "", time: "", before_after: "" };  // Default structure
+        }
+      })(),
+    
+    }));
+    
   } catch (error) {
     console.error('Get Patient Data Failed', error);
   }
@@ -286,9 +380,23 @@ const getVitalSignsList = async (patient_uuid) => {
   }
 };
 
+const fetchFamilyMembers = async (patient_uuid) => {
+  try {
+    const response = await apiRequest(`https://staging.itbrightsolution.com/ixora_backend/public/api/v1/patient/${ patient_uuid }/show_family_members`);
+    const patients = response.data;
+    options.value = patients.map(patient => ({
+      name: patient.username,
+      uuid: patient.uuid,
+      selected: patient.selected
+    }));
+    selectUser.value = options.value.filter(option => option.selected);
+  } catch (error) {
+    console.error('Failed to fetch member list:', error);
+  }
+};     
+
 
 const currentPage = ref(1);
-const currentPageT = ref(1);
 const currentPageReminder = ref(1);
 const currentPageIntro = ref(1);
 const currentPageReport = ref(1);
@@ -298,24 +406,13 @@ const perPage = 10; // Assuming 10 patients per page
 
 /// Function to calculate the total number of pages
 const totalPages = computed(() => Math.ceil(medicationRecords.value.length / perPage));
-const totalPagesT = computed(() => Math.ceil(mrTemporary.value.length / perPage));
 const totalPagesReminder = computed(() => Math.ceil(reminders.value.length / perPage));
 const totalPagesIntro = computed(() => Math.ceil(introduction.value.length / perPage));
 const totalPagesReport = computed(() => Math.ceil(reports.value.length / perPage));
 const totalPagesVital = computed(() => Math.ceil(vitalSigns.value.length / perPage));
 
 // Function to get the subset of patients to display on the current page
-const medicationRecordsDisplay = computed(() => {
-  const startIndex = (currentPage.value - 1) * perPage;
-  const endIndex = startIndex + perPage;
-  return medicationRecords.value.slice(startIndex, endIndex);
-});
 
-const mrTemporaryDisplay = computed(() => {
-  const startIndex = (currentPage.value - 1) * perPage;
-  const endIndex = startIndex + perPage;
-  return mrTemporary.value.slice(startIndex, endIndex);
-});
 
 const remindersDisplay = computed(() => {
   const startIndex = (currentPageReminder.value - 1) * perPage;
@@ -346,9 +443,6 @@ const goToPage = (page) => {
   currentPage.value = page;
 };
 
-const goToPageT = (page) => {
-  currentPageT.value = page;
-};
 
 const goToPageReminder = (page) => {
   currentPageReminder.value = page;
@@ -366,12 +460,6 @@ const goToPageReport = (page) => {
 const nextPage = () => {
   if (currentPage.value < totalPages.value) {
     currentPage.value++;
-  }
-};
-
-const nextPageT = () => {
-  if (currentPageT.value < totalPagesT.value) {
-    currentPageT.value++;
   }
 };
 
@@ -406,12 +494,6 @@ const prevPage = () => {
   }
 };
 
-const prevPageT = () => {
-  if (currentPageT.value > 1) {
-    currentPageT.value--;
-  }
-};
-
 const prevPageReminder = () => {
   if (currentPageReminder.value > 1) {
     currentPageReminder.value--;
@@ -435,6 +517,38 @@ const prevPageVital = () => {
     currentPageVital.value--;
   }
 };
+
+const vitalTable = ref(null);
+const medicationTable = ref(null);
+
+const printTable = () => {
+  const printContent = vitalTable.value.outerHTML; // Get the table HTML content
+  const originalContent = document.body.innerHTML; // Backup the original content of the page
+
+  document.body.innerHTML = printContent; // Replace the body content with only the table
+  window.print(); // Trigger the print dialog
+  document.body.innerHTML = originalContent; // Restore the original page content
+  location.reload();
+};
+
+const printMedicationTable = () => {
+  const printContent = medicationTable.value.outerHTML; // Get the table HTML content
+  const originalContent = document.body.innerHTML; // Backup the original content of the page
+
+  document.body.innerHTML = printContent; // Replace the body content with only the table
+  window.print(); // Trigger the print dialog
+  document.body.innerHTML = originalContent; // Restore the original page content
+  location.reload();
+};
+
+const displayedRecords = computed(() => {
+  const recordsToDisplay = recordType.value ? medicationRecords.value : mrTemporary.value;
+
+  const startIndex = (currentPage.value - 1) * perPage; // Calculate the starting index
+  const endIndex = startIndex + perPage; // Calculate the ending index
+
+  return recordsToDisplay.slice(startIndex, endIndex); // Return the sliced array
+});
 
 </script>
 <template>
@@ -473,6 +587,7 @@ const prevPageVital = () => {
               class="mx-auto mt-3 col-lg-4 col-md-6 my-sm-auto ms-sm-auto me-sm-0 text-end"
             >
               <div class="nav-wrapper position-relative end-0">
+                <argon-button class="mx-3" color="primary" @click="showChangePassword">Change Password</argon-button>
                 <argon-button color="secondary" @click="showModalD()">Change Profile Image</argon-button>
               </div>
             </div>
@@ -521,7 +636,7 @@ const prevPageVital = () => {
                   <label for="example-text-input" class="form-control-label"
                     >IC Number</label
                   >
-                  <argon-input type="text" v-model="form.ic_number" required/>
+                  <argon-input type="number" v-model="form.ic_number" required/>
                 </div>
               </div>
               <hr class="horizontal dark" />
@@ -533,17 +648,45 @@ const prevPageVital = () => {
                   </argon-textarea>
                 </div>
                 <div class="col-md-3" >
+                  <div v-for="(name, index) in form.emergency_name" :key="index">
+                    <label :for="`emergency-name-${index}`" class="form-control-label">
+                      Emergency Contact Name {{ index + 1 }}{{ index === 0 ? '' : ' (Optional)' }}
+                    </label>
+                    <argon-input type="text" v-model="name.phone" required/>
+                  </div>
+                </div>
+                <div class="col-md-3" >
                   <div v-for="(contact, index) in form.emergency_contact" :key="index">
                     <label :for="`emergency-contact-${index}`" class="form-control-label">
                       Emergency Contact {{ index + 1 }}{{ index === 0 ? '' : ' (Optional)' }}
                     </label>
-                    <argon-input type="text" v-model="contact.phone" required/>
+                    <argon-input type="number" v-model="contact.phone" required/>
                   </div>
                 </div>
               </div>
             </div>
           </form>
         </div>
+
+        <!-- Family Member -->
+        <div class="col-md-12 mt-5">
+          <div class="card">
+            <div class="card-header pb-0">
+              <div class="d-flex align-items-center justify-content-between">
+                <p class="mb-0 text-primary font-weight-bolder">Family Members</p>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-6">
+                  <multiselect v-model="selectUser" :options="options" label="name" :multiple="true" :close-on-select="false" track-by="uuid" placeholder="Select users"></multiselect>
+                  <argon-button @click="assignFamily" class="mt-3">Assign</argon-button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div class="col-md-12 mt-5">
           <div class="card">
             <div class="card-header pb-0">
@@ -555,14 +698,18 @@ const prevPageVital = () => {
                     <span v-else class="text-dark font-weight-bolder">Temporary</span>
                   </argon-switch>
                 </div>
-                <a
-                  :href="`../create-medication/?uuid=${form.uuid}`"
-                >
-                  <argon-button >Add</argon-button>
-                </a>
+                <div>
+                  <argon-button class="mx-3" color="dark" @click="printMedicationTable">Print</argon-button>
+                  <a
+                    :href="`../create-medication/?uuid=${form.uuid}`"
+                  >
+                    <argon-button >Add</argon-button>
+                  </a>
+                </div>
+                
               </div>
             </div>
-            <div v-if="recordType" class="card-body px-0 pt-0 pb-2">
+            <div class="card-body px-0 pt-0 pb-2">
               <div class="table-responsive p-0">
                 <table class="table align-items-center mb-0">
                   <thead>
@@ -570,7 +717,7 @@ const prevPageVital = () => {
                       <th
                         class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
                       >
-                        Name
+                        Medicine Name
                       </th>
                       <th
                         class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
@@ -597,7 +744,7 @@ const prevPageVital = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-for="(medication, index) in medicationRecordsDisplay" :key="index">
+                    <tr v-for="(medication, index) in displayedRecords" :key="index">
                       <td>
                         <div class="d-flex px-2 py-1">
                           <div>
@@ -671,7 +818,7 @@ const prevPageVital = () => {
                 </nav>
               </div>
             </div>
-            <div v-else class="card-body px-0 pt-0 pb-2">
+            <!-- <div v-else class="card-body px-0 pt-0 pb-2">
               <div class="table-responsive p-0">
                 <table class="table align-items-center mb-0">
                   <thead>
@@ -679,7 +826,7 @@ const prevPageVital = () => {
                       <th
                         class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
                       >
-                        Name
+                        Medicine Name
                       </th>
                       <th
                         class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
@@ -779,9 +926,38 @@ const prevPageVital = () => {
                   </ul>
                 </nav>
               </div>
-            </div>
+            </div> -->
           </div>
         </div>
+        <div class="d-none">
+          <table class="printTable border" ref="medicationTable">
+            <tr class="border">
+              <th>Medication Name</th>
+              <th>Unit</th>
+              <th>Dose</th>
+              <th>Frequency</th>
+              <th>Inventory</th>
+              <th>Routine</th>
+              <th>Before/After Meal</th>
+              <th>Time</th>
+              <th>Remark</th>
+              <th>Updated At</th>
+            </tr>
+            <tr v-for="(medication, index) in displayedRecords" :key="index">
+              <td>{{ medication.medication_name }}</td>
+              <td>{{ medication.unitLabel }}</td>
+              <td>{{ medication.dosing }}</td>
+              <td>{{ medication.frequency }}</td>
+              <td>{{ medication.inventory }}</td>
+              <td>{{ medication.routine }}</td>
+              <td>{{ medication.remark.before_after || 'N/A' }}</td>
+              <td>{{ medication.remark.time || 'N/A' }}</td>
+              <td>{{ medication.remark.remark || 'N/A' }}</td>
+              <td>{{ medication.updated_at }}</td>
+            </tr>
+          </table>
+        </div>
+        
         <div class="col-md-6 mt-5">
           <div class="card">
             <div class="card-header pb-0">
@@ -812,12 +988,12 @@ const prevPageVital = () => {
                       <th
                         class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
                       >
-                        Date Replaced
+                        Date
                       </th>
                       <th
                         class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
                       >
-                        Updated By
+                        Updated At
                       </th>
                       <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Edit</th>
                       <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Delete</th>
@@ -836,7 +1012,7 @@ const prevPageVital = () => {
                         <span class="badge badge-sm bg-gradient-warning">{{ reminder.frequency_weeks }}</span>
                       </td>
                       <td class="align-middle text-center text-sm">
-                        <span class="text-secondary text-xs font-weight-bold">{{ reminder.date_replaced }}</span>
+                        <span class="text-secondary text-xs font-weight-bold">{{ reminder.date_from }}</span>
                       </td>
                       <td class="align-middle text-center text-sm">
                         <span class="text-secondary text-xs font-weight-bold">{{ reminder.updated_at }}</span>
@@ -1109,20 +1285,23 @@ const prevPageVital = () => {
           </div>
         </div>
 
-        <div class="col-md-6 mt-5">
+        <div class="col-md-12 mt-5">
           <div class="card">
             <div class="card-header pb-0">
               <div class="d-flex align-items-center justify-content-between">
                 <p class="mb-0 text-primary font-weight-bolder">Vital Sign</p>
-                <a
-                  :href="`../create-vital/?uuid=${form.uuid}`"
-                >
-                  <argon-button >Add</argon-button>
-                </a>
+                <div>
+                  <argon-button color="dark" class="mx-3" @click="printTable">Print</argon-button>
+                  <a
+                    :href="`../create-vital/?uuid=${form.uuid}`"
+                  >
+                    <argon-button >Add</argon-button>
+                  </a>
+                </div>  
               </div>
             </div>
             <div class="card-body px-0 pt-0 pb-2">
-              <div class="table-responsive p-0">
+              <div class="table-responsive p-0" ref="vitalTable">
                 <table class="table align-items-center mb-0">
                   <thead>
                     <tr>
@@ -1134,12 +1313,37 @@ const prevPageVital = () => {
                       <th
                         class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
                       >
-                        Created By
+                        Blood Pressure Diastolic/Systolic
                       </th>
                       <th
                         class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
                       >
-                        Updated By
+                        SPO2
+                      </th>
+                      <th
+                        class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                      >
+                        Pulse Rate
+                      </th>
+                      <th
+                        class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                      >
+                        Blood Glucose Level (Before Eat)
+                      </th>
+                      <th
+                        class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                      >
+                        Blood Glucose Level (After Eat)
+                      </th>
+                      <th
+                        class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                      >
+                        Created At
+                      </th>
+                      <th
+                        class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                      >
+                        Updated At
                       </th>
                       <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Edit</th>
                       <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Delete</th>
@@ -1149,20 +1353,28 @@ const prevPageVital = () => {
                     <tr v-for="(vital, index) in vitalsDisplay" :key="index">
                       <td>
                         <div class="d-flex px-2 py-1">
-                          <div>
-                            <!-- <img
-                              src="../../assets/img/team-2.jpg"
-                              class="avatar avatar-sm me-3"
-                              alt="user1"
-                            /> -->
-                          </div>
                           <div class="d-flex flex-column justify-content-center">
                             <h6 class="mb-0 text-sm">{{ vital.remark }}</h6>
                           </div>
                         </div>
                       </td>
                       <td class="align-middle text-center text-sm">
-                        <span class="text-secondary text-xs font-weight-bold">{{ vital.created_by }}</span>
+                        <span class="text-secondary text-xs font-weight-bold">{{ vital.blood_pressure_diastolic }}/{{ vital.blood_pressure_systolic }}  mmHg</span>
+                      </td>
+                      <td class="align-middle text-center text-sm">
+                        <span class="text-secondary text-xs font-weight-bold">{{ vital.spo2 }} %</span>
+                      </td>
+                      <td class="align-middle text-center text-sm">
+                        <span class="text-secondary text-xs font-weight-bold">{{ vital.pulse_rate }} bpm</span>
+                      </td>
+                      <td class="align-middle text-center text-sm">
+                        <span class="text-secondary text-xs font-weight-bold">{{ vital.blood_glucose_level_before }} mmol/L</span>
+                      </td>
+                      <td class="align-middle text-center text-sm">
+                        <span class="text-secondary text-xs font-weight-bold">{{ vital.blood_glucose_level_after }} mmol/L</span>
+                      </td>
+                      <td class="align-middle text-center text-sm">
+                        <span class="text-secondary text-xs font-weight-bold">{{ vital.created_at }}</span>
                       </td>
                       <td class="align-middle text-center text-sm">
                         <span class="text-secondary text-xs font-weight-bold">{{ vital.updated_at }}</span>
@@ -1216,6 +1428,30 @@ const prevPageVital = () => {
             </div>
           </div>
         </div>
+
+        <div class="d-none">
+          <table class="printTable border" ref="vitalTable">
+            <tr class="border">
+              <th>Blood Pressure Diastolic / Systolic</th>
+              <th>SPO2</th>
+              <th>Pulse Rate</th>
+              <th>Blood Glucose Level (Before/After Eat)</th>
+              <th>Created At</th>
+              <th>Updated At</th>
+              <th>Remark</th>
+            </tr>
+            <tr v-for="(vital, index) in vitalsDisplay" :key="index">
+              <td>{{ vital.blood_pressure_diastolic }}/{{ vital.blood_pressure_systolic }} mmHg</td>
+              <td>{{ vital.spo2 }} %</td>
+              <td>{{ vital.pulse_rate }} bpm</td>
+              <td>{{ vital.blood_glucose_level_before }}/{{ vital.blood_glucose_level_after }} mmol/L</td>
+              <td>{{ vital.created_at }} by {{ vital.created_by }}</td>
+              <td>{{ vital.updated_at }} by {{ vital.updated_by }}</td>
+              <td>{{ vital.remark }}</td>
+            </tr>
+          </table>
+        </div>
+
       </div>
     </div>
     <error-modal :show-modal="showErrorModal" :error-message="errorMessage" @close="showErrorModal = false" />

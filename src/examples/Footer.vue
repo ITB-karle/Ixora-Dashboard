@@ -9,16 +9,7 @@
           <div
             class="text-sm text-center copyright text-muted"
           >
-            ©
-            {{ new Date().getFullYear() }}, made with
-            <i class="fa fa-heart"></i> by
-            <a
-              href="https://www.creative-tim.com"
-              class="font-weight-bold"
-              target="_blank"
-              >Creative Tim</a
-            >
-            for a better web.
+          Copyright 2024 @ Ixora Senior Care | All Rights Reserved
           </div>
         </div>
         <div class="col-lg-6">

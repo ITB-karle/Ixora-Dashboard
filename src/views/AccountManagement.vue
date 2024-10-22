@@ -45,7 +45,7 @@ const changeToHelpdesk = () => {
 
     <div class="row">
       <div class="col-6 col-md-3 my-3">
-        <button class="btn w-100" :class="{ 'btn-light': activeButton !== 'members', 'btn-dark': activeButton === 'members' }" @click="changeToMembers">Members</button>
+        <button class="btn w-100" :class="{ 'btn-light': activeButton !== 'members', 'btn-dark': activeButton === 'members' }" @click="changeToMembers">Users</button>
       </div>
       <div class="col-6 col-md-3 my-3">
         <button class="btn w-100" :class="{ 'btn-light': activeButton !== 'doctors', 'btn-dark': activeButton === 'doctors' }" @click="changeToDoctors">Medical</button>
