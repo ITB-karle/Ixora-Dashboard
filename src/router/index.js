@@ -26,9 +26,9 @@ import EditReport from "../views/EditReport.vue";
 import CreateVital from "../views/CreateVital.vue";
 import EditVital from "../views/EditVital.vue";
 import MonthlyReminder from "../views/MonthlyReminder.vue";
-import ForumList from "../views/ForumList.vue";
-import CreateForum from "../views/CreateForum.vue";
-import EditForum from "../views/EditForum.vue";
+import FeedsList from "../views/FeedsList.vue";
+import CreateFeeds from "../views/CreateFeeds.vue";
+import EditFeeds from "../views/EditFeeds.vue";
 import NotificationList from "../views/NotificationList.vue";
 import CreateNotification from "../views/CreateNotification.vue";
 import EditNotification from "../views/EditNotification.vue";
@@ -176,19 +176,19 @@ const routes = [
     component: MonthlyReminder,
   },
   {
-    path: "/forum-list",
-    name: "Forum List",
-    component: ForumList,
+    path: "/feeds-list",
+    name: "Feeds List",
+    component: FeedsList,
   },
   {
-    path: "/create-forum",
-    name: "Create Forum",
-    component: CreateForum,
+    path: "/create-feeds",
+    name: "Create Feeds",
+    component: CreateFeeds,
   },
   {
-    path: "/edit-forum",
-    name: "Edit Forum",
-    component: EditForum,
+    path: "/edit-feeds",
+    name: "Edit Feeds",
+    component: EditFeeds,
   },
   {
     path: "/notification-list",

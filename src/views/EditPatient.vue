@@ -124,7 +124,7 @@ const deleteData = async (deleteDataID, deleteType) => {
     //   showDeleteModal.value = false;
     //   router.go();
     // } catch (error) {
-    //   console.error('Forum Data Delete Failed', error);
+    //   console.error('Feeds Data Delete Failed', error);
     // }
   } else if (deleteType == 'reminder') {
     try {
@@ -282,9 +282,13 @@ const getPatientDetails = async (patient_uuid) => {
     // Example using axios:
     const response = await apiRequest(`https://staging.itbrightsolution.com/ixora_backend/public/api/v1/patient/${ patient_uuid }/show`);
     patientProfile.value = response.data.profile;
-    const { emergency_contact, emergency_name, gender, ...profileData} = { ...response.data.profile }
-    const emergencyContactObjects = emergency_contact.map(contact => ({ phone: contact }));
-    const emergencyNameObjects = emergency_name.map(name => ({ phone: name }));
+    const { emergency_contact = [], emergency_name = [], gender, ...profileData} = { ...response.data.profile }
+    const emergencyContactObjects = Array.from({ length: 3 }, (_, i) => ({
+      phone: emergency_contact[i] || ''
+    }));
+    const emergencyNameObjects = Array.from({ length: 3 }, (_, i) => ({
+      phone: emergency_name[i] || ''
+    }));
     form.value = { ...profileData, gender: gender == 'male' ? 1 : 2, emergency_contact: emergencyContactObjects, emergency_name: emergencyNameObjects };
     // selectUser.value = patientProfile.value.family_members;
     // medicationRecords.value = response.data.medication_records;
@@ -550,6 +554,46 @@ const displayedRecords = computed(() => {
   return recordsToDisplay.slice(startIndex, endIndex); // Return the sliced array
 });
 
+const groupedMedications = computed(() => {
+    const grouped = {};
+
+    medicationRecords.value.forEach((medication) => {
+        const beforeAfter = medication.remark.before_after || "Others";
+        const time = medication.remark.time || "No Specific Time";
+
+        if (!grouped[beforeAfter]) {
+            grouped[beforeAfter] = {};
+        }
+        if (!grouped[beforeAfter][time]) {
+            grouped[beforeAfter][time] = [];
+        }
+
+        grouped[beforeAfter][time].push(medication);
+    });
+
+    return grouped;
+});
+
+const groupedTpMedications = computed(() => {
+    const grouped = {};
+
+    mrTemporary.value.forEach((medication) => {
+        const beforeAfter = medication.remark.before_after || "Others";
+        const time = medication.remark.time || "No Specific Time";
+
+        if (!grouped[beforeAfter]) {
+            grouped[beforeAfter] = {};
+        }
+        if (!grouped[beforeAfter][time]) {
+            grouped[beforeAfter][time] = [];
+        }
+
+        grouped[beforeAfter][time].push(medication);
+    });
+
+    return grouped;
+});
+
 </script>
 <template>
   <main>
@@ -652,7 +696,7 @@ const displayedRecords = computed(() => {
                     <label :for="`emergency-name-${index}`" class="form-control-label">
                       Emergency Contact Name {{ index + 1 }}{{ index === 0 ? '' : ' (Optional)' }}
                     </label>
-                    <argon-input type="text" v-model="name.phone" required/>
+                    <argon-input type="text" v-model="form.emergency_name[index].phone" :required="index === 0" />
                   </div>
                 </div>
                 <div class="col-md-3" >
@@ -660,7 +704,7 @@ const displayedRecords = computed(() => {
                     <label :for="`emergency-contact-${index}`" class="form-control-label">
                       Emergency Contact {{ index + 1 }}{{ index === 0 ? '' : ' (Optional)' }}
                     </label>
-                    <argon-input type="number" v-model="contact.phone" required/>
+                    <argon-input type="number" v-model="form.emergency_contact[index].phone" :required="index === 0" />
                   </div>
                 </div>
               </div>
@@ -929,33 +973,39 @@ const displayedRecords = computed(() => {
             </div> -->
           </div>
         </div>
+
         <div class="d-none">
-          <table class="printTable border" ref="medicationTable">
-            <tr class="border">
-              <th>Medication Name</th>
-              <th>Unit</th>
-              <th>Dose</th>
-              <th>Frequency</th>
-              <th>Inventory</th>
-              <th>Routine</th>
-              <th>Before/After Meal</th>
-              <th>Time</th>
-              <th>Remark</th>
-              <th>Updated At</th>
-            </tr>
-            <tr v-for="(medication, index) in displayedRecords" :key="index">
-              <td>{{ medication.medication_name }}</td>
-              <td>{{ medication.unitLabel }}</td>
-              <td>{{ medication.dosing }}</td>
-              <td>{{ medication.frequency }}</td>
-              <td>{{ medication.inventory }}</td>
-              <td>{{ medication.routine }}</td>
-              <td>{{ medication.remark.before_after || 'N/A' }}</td>
-              <td>{{ medication.remark.time || 'N/A' }}</td>
-              <td>{{ medication.remark.remark || 'N/A' }}</td>
-              <td>{{ medication.updated_at }}</td>
-            </tr>
-          </table>
+          <div ref="medicationTable">
+            <div><b><u>{{ form.name }}'s Medication Records</u></b></div>
+            <div v-if="medicationRecords.length > 0">
+              <div><b><u>Permanent Supply Medication</u></b></div>
+              <div v-for="(timeGroups, beforeAfter) in groupedMedications" :key="beforeAfter" class="mb-3">
+                <div><strong>{{ beforeAfter }}</strong></div>
+
+                <div v-for="(medications, time) in timeGroups" :key="time">
+                  <div><u>{{ time }}</u></div>
+
+                  <div v-for="(medication, index) in medications" :key="index">
+                    <div>{{ index + 1 }}) {{ medication.medication_name }} - {{ medication.dosing }} {{ medication.unitLabel }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div v-if="mrTemporary.length > 0" class="mt-5">
+              <div><b><u>Temporary Supply Medication</u></b></div>
+              <div v-for="(timeGroups, beforeAfter) in groupedTpMedications" :key="beforeAfter" class="mb-3">
+                <div><strong>{{ beforeAfter }}</strong></div>
+
+                <div v-for="(medications, time) in timeGroups" :key="time">
+                  <div><u>{{ time }}</u></div>
+
+                  <div v-for="(medication, index) in medications" :key="index">
+                    <div>{{ index + 1 }}) {{ medication.medication_name }} - {{ medication.dosing }} {{ medication.unitLabel }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
         
         <div class="col-md-6 mt-5">
@@ -1115,7 +1165,7 @@ const displayedRecords = computed(() => {
                             /> -->
                           </div>
                           <div class="d-flex flex-column justify-content-center">
-                            <h6 class="mb-0 text-sm">{{ introduction.remark }}</h6>
+                            <h6 class="mb-0 text-sm" style="text-overflow: ellipsis; overflow: hidden; width: 150px; white-space: nowrap;">{{ introduction.remark }}</h6>
                           </div>
                         </div>
                       </td>

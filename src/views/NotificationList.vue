@@ -198,7 +198,7 @@ const prevPage = () => {
                       </td>
                       <!-- <td class="align-middle text-center text-sm">
                         <img
-                          :src="forum.media"
+                          :src="feeds.media"
                           class="avatar avatar-sm me-3"
                           alt="user1"
                         />

@@ -11,7 +11,7 @@ const router = useRouter();
 
 onMounted(() => {
 
-  getForumList();
+  getFeedsList();
   // Extract the UUID from the URL query parameters
   // const urlParams = new URLSearchParams(window.location.search);
   // const patient_uuid = urlParams.get('uuid');
@@ -27,12 +27,12 @@ onMounted(() => {
 
 
 const showDeleteModal = ref(false);
-const deleteMessage = ref("Do you want to delete this forum?")
-const deleteForumID = ref('');
+const deleteMessage = ref("Do you want to delete this feeds?")
+const deleteFeedsID = ref('');
 
-const showModalD = (forum_uuid) => {
+const showModalD = (feeds_uuid) => {
   showDeleteModal.value = true;
-  deleteForumID.value = forum_uuid;
+  deleteFeedsID.value = feeds_uuid;
 };
 
 const closeModal = () => {
@@ -40,27 +40,27 @@ const closeModal = () => {
 };
 
 
-const forum = ref([]);
+const feeds = ref([]);
 
-const getForumList = async () => {
+const getFeedsList = async () => {
   try {
     const response = await apiRequest(`https://staging.itbrightsolution.com/ixora_backend/public/api/v1/forum/fullList?search&new&status&paginate&per_page`);
-    forum.value = response.data;
+    feeds.value = response.data;
 
   } catch (error) {
-    console.error('Get Forum List Failed', error);
+    console.error('Get Feeds List Failed', error);
     // Handle login error
   }
 };
 
-const deleteForum = async (forum_uuid) => {
+const deleteFeeds = async (feeds_uuid) => {
   try {
-    const response = await apiRequest(`https://staging.itbrightsolution.com/ixora_backend/public/api/v1/forum/delete`, {forum_uuid});
+    const response = await apiRequest(`https://staging.itbrightsolution.com/ixora_backend/public/api/v1/forum/delete`, {feeds_uuid});
     console.log("Success", response);
     closeModal();
     router.go();
   } catch (error) {
-    console.error('Forum Data Delete Failed', error);
+    console.error('Feeds Data Delete Failed', error);
   }
 };
 
@@ -70,13 +70,13 @@ const perPage = 10; // Assuming 10 patients per page
 
 
 /// Function to calculate the total number of pages
-const totalPages = computed(() => Math.ceil(forum.value.length / perPage));
+const totalPages = computed(() => Math.ceil(feeds.value.length / perPage));
 
 // Function to get the subset of patients to display on the current page
-const forumDisplay = computed(() => {
+const feedsDisplay = computed(() => {
   const startIndex = (currentPage.value - 1) * perPage;
   const endIndex = startIndex + perPage;
-  return forum.value.slice(startIndex, endIndex);
+  return feeds.value.slice(startIndex, endIndex);
 });
 
 
@@ -111,9 +111,9 @@ const prevPage = () => {
           <div class="card">
             <div class="card-header pb-0">
               <div class="d-flex align-items-center justify-content-between">
-                <p class="mb-0 text-primary font-weight-bolder">Forum List</p>
+                <p class="mb-0 text-primary font-weight-bolder">Feeds List</p>
                 <a
-                  :href="`../create-forum`"
+                  :href="`../create-feeds`"
                 >
                   <argon-button >Add</argon-button>
                 </a>
@@ -161,7 +161,7 @@ const prevPage = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-for="(forum, index) in forumDisplay" :key="index">
+                    <tr v-for="(feeds, index) in feedsDisplay" :key="index">
                       <td>
                         <div class="d-flex px-2 py-1">
                           <div>
@@ -172,36 +172,36 @@ const prevPage = () => {
                             /> -->
                           </div>
                           <div class="d-flex flex-column justify-content-center">
-                            <h6 class="badge badge-sm bg-gradient-primary">{{ forum.id }}</h6>
+                            <h6 class="badge badge-sm bg-gradient-primary">{{ feeds.id }}</h6>
                           </div>
                         </div>
                       </td>
                       <td class="align-middle text-center text-sm">
-                        <span class="text-secondary text-xs font-weight-bold">{{ forum.receiver_uuid.name }}</span>
+                        <span class="text-secondary text-xs font-weight-bold">{{ feeds.receiver_uuid.name }}</span>
                       </td>
                       <!-- <td class="align-middle text-center text-sm">
                         <img
-                          :src="forum.media"
+                          :src="feeds.media"
                           class="avatar avatar-sm me-3"
                           alt="user1"
                         />
                       </td> -->
                       <td class="align-middle text-center text-sm">
-                        <span class="text-secondary text-xs font-weight-bold text-truncate">{{ forum.text }}</span>
+                        <span class="text-secondary text-xs font-weight-bold text-truncate">{{ feeds.text }}</span>
                       </td>
                       <td class="align-middle text-center">
                         <span class="text-secondary text-xs font-weight-bold"
-                          >{{ forum.created_by.name }}</span
+                          >{{ feeds.created_by.name }}</span
                         >
                       </td>
                       <td class="align-middle text-center">
                         <span class="text-secondary text-xs font-weight-bold"
-                          >{{ forum.created_at }}</span
+                          >{{ feeds.created_at }}</span
                         >
                       </td>
                       <td class="align-middle text-center">
                         <a
-                          :href="`../edit-forum/?uuid=${forum.uuid}`"
+                          :href="`../edit-feeds/?uuid=${feeds.uuid}`"
                           class="text-secondary font-weight-bold text-xs"
                           data-toggle="tooltip"
                           data-original-title="Edit user"
@@ -213,10 +213,10 @@ const prevPage = () => {
                       </td>
                       <td class="align-middle text-center">
                         <a
-                          @click="showModalD(forum.uuid)"
+                          @click="showModalD(feeds.uuid)"
                           class="text-secondary font-weight-bold text-xs"
                           data-toggle="tooltip"
-                          data-original-title="Delete Forum"
+                          data-original-title="Delete Feeds"
                           >
                           <argon-button color="danger">
                             <i class="fas fa-trash"></i>
@@ -256,22 +256,22 @@ const prevPage = () => {
       <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">Delete Forum</h5>
+            <h5 class="modal-title">Delete Feeds</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true" @click="closeModal">&times;</span>
             </button>
           </div>
           <div class="modal-body">
-            <p>Are u sure to delete this forum ?</p>
+            <p>Are u sure to delete this feeds ?</p>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-primary" @click="deleteForum(deleteForumID)">Confirm</button>
+            <button type="button" class="btn btn-primary" @click="deleteFeeds(deleteFeedsID)">Confirm</button>
             <button type="button" class="btn btn-secondary" @click="closeModal">Cancel</button>
           </div>
         </div>
       </div>
     </div> -->
-    <delete-modal :show-modal="showDeleteModal" :delete-message="deleteMessage" @close="showDeleteModal = false" @delete-data="deleteForum(deleteForumID)" />
+    <delete-modal :show-modal="showDeleteModal" :delete-message="deleteMessage" @close="showDeleteModal = false" @delete-data="deleteFeeds(deleteFeedsID)" />
   </main>
 </template>
 

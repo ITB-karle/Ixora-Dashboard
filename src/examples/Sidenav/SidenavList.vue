@@ -189,9 +189,9 @@ const getRoute = () => {
 
       <li class="nav-item">
         <sidenav-item
-          to="/forum-list"
-          :class="getRoute() === 'forum-list' ? 'active' : ''"
-          :navText="'Forum List'"
+          to="/feeds-list"
+          :class="getRoute() === 'feeds-list' ? 'active' : ''"
+          :navText="'Feeds List'"
         >
           <template v-slot:icon>
             <i

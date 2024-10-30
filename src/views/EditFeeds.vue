@@ -31,7 +31,7 @@ onMounted(() => {
 
   // Call getUserProfile function with the extracted UUID
   if (uuid) {
-    getForum(uuid);
+    getFeeds(uuid);
   } else {
       console.error('UUID not found in URL query parameters');
       // Handle error
@@ -79,7 +79,7 @@ const goListPage = () => {
 
 const oldImages= ref([]);
 
-const getForum = async (uuid) => {
+const getFeeds = async (uuid) => {
   try {
     const response = await apiRequest(`https://staging.itbrightsolution.com/ixora_backend/public/api/v1/forum/${uuid}/show`);
     form.value = { ...response.data, files: response.data?.files ?? [] };
@@ -98,7 +98,7 @@ const getForum = async (uuid) => {
 };
 
 const form = ref({
-  forum_uuid: '',
+  feeds_uuid: '',
   text: '',
   receiver_uuid: {
     name: '',
@@ -106,10 +106,10 @@ const form = ref({
   files: [],
 });
 
-const updateForum = async () => {
+const updateFeeds = async () => {
 
   const data = {
-    forum_uuid: form.value.uuid,
+    feeds_uuid: form.value.uuid,
     text: form.value.text,
   }
 
@@ -126,7 +126,7 @@ const updateForum = async () => {
     const response = await apiRequest(`https://staging.itbrightsolution.com/ixora_backend/public/api/v1/forum/update`,
     {...data, ...newimglist});
     if (response.http_status < 300) {
-      handleApiSuccess('Forum created successfully');
+      handleApiSuccess('Feeds created successfully');
       form.value.files = [];
       images.value = [];
     } else {
@@ -193,17 +193,17 @@ const removeImage = (index) => {
       <back-button class="position-relative mb-3" />
       <div class="row">
         <div class="col-md-12">
-          <form class="card" @submit.prevent="updateForum">
+          <form class="card" @submit.prevent="updateFeeds">
             <div class="card-header pb-0">
               <div class="d-flex align-items-center">
-                 <p class="mb-0 text-primary font-weight-bolder">Update Forum</p>
+                 <p class="mb-0 text-primary font-weight-bolder">Update Feeds</p>
                 <argon-button color="warning" size="sm" class="ms-auto">
                   Update
                 </argon-button>
               </div>
             </div>
             <div class="card-body">
-              <p class="text-uppercase text-sm">Forum Information</p>
+              <p class="text-uppercase text-sm">Feeds Information</p>
               <div class="row">
                 <div class="col-md-6">
                   <label for="example-text-input" class="form-control-label"

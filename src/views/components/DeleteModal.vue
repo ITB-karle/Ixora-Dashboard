@@ -35,7 +35,7 @@ const { showModal, deleteMessage } = defineProps({
   },
 });
 
-const emit = defineEmits(['closeModal', 'deleteForum']);
+const emit = defineEmits(['closeModal', 'deleteFeeds']);
 
 const closeModal = () => {
   emit('close'); // Emit event to parent to close modal

@@ -51,11 +51,50 @@ import ArgonButton from "@/components/ArgonButton.vue";
       currentPage.value--;
     }
   };
+
+  const showModal = ref(false);
+  const userData = ref('');
+  const familyPatients = ref('');
+
+  const openModal = (uuid) => {
+    showModal.value = true;
+    getUserDetails(uuid);
+    getUserFamilyPatients(uuid);
+  };
+
+  const closeModal = () => {
+    showModal.value = false;
+  };
+
+  const getUserDetails = async (uuid) => {
+    try {
+      // Make API call to authenticate user
+      // Example using axios:
+      const response = await apiRequest(`https://staging.itbrightsolution.com/ixora_backend/public/api/v1/user/${uuid}/show`);
+      userData.value = response.data;
+    } catch (error) {
+      console.error('Get Data Failed', error);
+      // Handle login error
+    }
+  };
+
+  const getUserFamilyPatients = async (uuid) => {
+    try {
+      // Make API call to authenticate user
+      // Example using axios:
+      const response = await apiRequest(`https://staging.itbrightsolution.com/ixora_backend/public/api/v1/user/${uuid}/show_family_patients`);
+      familyPatients.value = response.data;
+    } catch (error) {
+      console.error('Get Data Failed', error);
+      // Handle login error
+    }
+  };
+
 </script>
 <template>
   <div class="card">
     <div class="card-header pb-0">
-      <h6>Users List</h6>
+      <h6>Family List</h6>
     </div>
     <div class="card-body px-0 pt-0 pb-2">
       <div class="table-responsive p-0">
@@ -118,9 +157,20 @@ import ArgonButton from "@/components/ArgonButton.vue";
                 <span class="text-secondary text-xs font-weight-bold">{{ member.updated_at }}</span>
               </td>
               <td class="align-middle text-center">
-                <a
+                <!-- <a
                   v-if="member.patient_uuid" 
                   :href="`edit-patient/?uuid=${member.patient_uuid}`"
+                  class="text-secondary font-weight-bold text-xs"
+                  data-toggle="tooltip"
+                  data-original-title="Edit user"
+                >
+                  <argon-button color="dark">
+                    <i class="fas fa-pen"></i>
+                  </argon-button>
+                </a> -->
+                <a
+                  v-if="member.patient_uuid" 
+                  @click="openModal(member.uuid)"
                   class="text-secondary font-weight-bold text-xs"
                   data-toggle="tooltip"
                   data-original-title="Edit user"
@@ -175,6 +225,44 @@ import ArgonButton from "@/components/ArgonButton.vue";
             </li>
           </ul>
         </nav>
+      </div>
+    </div>
+    <div v-if="showModal" class="modal fade show d-block" tabindex="-1" role="dialog">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <form class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" style="color: black;">{{ userData.name }}'s Patients</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true" @click="closeModal">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <h6>Family Members:</h6>
+            <div v-for="(family, index) in familyPatients" :key="index" class="d-flex justify-content-between border rounded mb-2 py-2 px-3">
+              <div class="d-flex align-items-center">
+                <i class="ni ni-single-02"></i>
+                <div class="ms-4">
+                  <div style="font-size: 9px;">Current Family</div>
+                  <div>{{ family.name }}</div>
+                </div>
+              </div>
+              <router-link
+                :to="{ path: 'edit-patient/', query: { uuid: family.uuid }}"
+                class="text-secondary font-weight-bold text-xs"
+              >
+                <argon-button color="danger">
+                  <i class="fas fa-pen"></i>
+                </argon-button>
+              </router-link>
+
+            </div>
+          </div>
+          <div class="modal-footer justify-content-center">
+            <div class="text-center">
+              <argon-button color="dark" @click="closeModal">Close</argon-button>
+            </div>
+          </div>
+        </form>
       </div>
     </div>
   </div>

@@ -61,7 +61,7 @@ const handleApiSuccess = (message) => {
 
 const goListPage= () => {
   showSuccessModal.value = false;
-  router.push('/forum-list');
+  router.push('/feeds-list');
 };
 
 // const userList = ref([]);
@@ -103,7 +103,7 @@ const createIntroduction = async () => {
     const response = await apiRequest(`https://staging.itbrightsolution.com/ixora_backend/public/api/v1/forum/store`,
     {...data, ...newimglist});
     if (response.http_status < 300) {
-      handleApiSuccess('Forum created successfully');
+      handleApiSuccess('Feeds created successfully');
     } else {
       throw new Error(response.message);
     }
@@ -167,14 +167,14 @@ const removeImage = (index) => {
           <div class="card">
             <div class="card-header pb-0">
               <div class="d-flex align-items-center">
-                 <p class="mb-0 text-primary font-weight-bolder">Create Forum</p>
+                 <p class="mb-0 text-primary font-weight-bolder">Create Feeds</p>
                 <argon-button color="success" size="sm" class="ms-auto" @click="createIntroduction">
                   Create
                 </argon-button>
               </div>
             </div>
             <div class="card-body">
-              <p class="text-uppercase text-sm">Forum Information</p>
+              <p class="text-uppercase text-sm">Feeds Information</p>
               <div class="row">
                 <div class="col-md-6">
                   <label for="example-text-input" class="form-control-label"

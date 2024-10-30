@@ -77,7 +77,16 @@ const goListPage = () => {
   router.push(`../edit-patient/?uuid=${form.value.patient_uuid}`);
 };
 
-const form = ref({});
+const form = ref({
+  patient_uuid: '',
+  blood_pressure_diastolic: '',
+  blood_pressure_systolic: '',
+  spo2: '',
+  pulse_rate: '',
+  blood_glucose_level_before: '',
+  blood_glucose_level_after: '',
+  remark: '',
+});
 
 const createVitalSign = async () => {
   const data = {
