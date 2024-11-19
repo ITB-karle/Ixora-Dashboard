@@ -229,7 +229,7 @@ const submitForm = async () => {
                     <label :for="`emergency-name-${index}`" class="form-control-label">
                       Emergency Contact Name {{ index + 1 }}{{ index === 0 ? '' : ' (Optional)' }}
                     </label>
-                    <argon-input type="text" v-model="name.phone" required/>
+                    <argon-input type="text" v-model="name[index].phone" :required="index === 0"/>
                   </div>
                 </div>
                 <div class="col-md-3" >
@@ -237,7 +237,7 @@ const submitForm = async () => {
                     <label :for="`emergency-contact-${index}`" class="form-control-label">
                       Emergency Contact {{ index + 1 }}{{ index === 0 ? '' : ' (Optional)' }}
                     </label>
-                    <argon-input type="number" v-model="contact.phone" required/>
+                    <argon-input type="number" v-model="contact[index].phone" :required="index === 0"/>
                   </div>
                 </div>
               </div>

@@ -6,6 +6,7 @@ import { useRouter } from 'vue-router';
 
 import setNavPills from "@/assets/js/nav-pills.js";
 import setTooltip from "@/assets/js/tooltip.js";
+import ArgonInput from "@/components/ArgonInput.vue";
 import ArgonButton from "@/components/ArgonButton.vue";
 import ArgonTextarea from "@/components/ArgonTextarea.vue";
 import BackButton from "./components/BackButton.vue";
@@ -183,8 +184,14 @@ const removeImage = (index) => {
                   <multiselect v-model="selectUser" :options="options" label="name" track-by="uuid" placeholder="Select users"></multiselect>
                 </div>
                 <div class="col-md-6">
+                  <label for="example-text-input" class="form-control-label"
+                    >Title</label
+                  >
+                  <argon-input type="text" v-model="form.title" />
+                </div>
+                <div class="col-md-6">
                   <argon-textarea :rows="8" type="text" v-model:title="form.text">
-                    Text
+                    Content
                   </argon-textarea>
                 </div>
                 <div class="col-md-6">
@@ -193,7 +200,7 @@ const removeImage = (index) => {
                     <h3>Image Preview:</h3>
                     <ul class="d-flex flex-wrap px-0" style="list-style-type: none;">
                       <li class="mx-3 text-center" v-for="(image, index) in images" :key="index">
-                        <img :src="image.url" :alt="image.name" class="border border-dark" width="200" height="120" />
+                        <img :src="image.url" :alt="image.name" class="border border-dark" width="200" height="120" style="object-fit: contain;" />
                         <p style="max-width: 200px; text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">{{ image.name }}</p>
                         <argon-button color="danger" class="text-xs text-center" @click="removeImage(index)">Remove</argon-button>
                       </li>
