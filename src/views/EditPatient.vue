@@ -696,7 +696,7 @@ const groupedTpMedications = computed(() => {
                     <label :for="`emergency-name-${index}`" class="form-control-label">
                       Emergency Contact Name {{ index + 1 }}{{ index === 0 ? '' : ' (Optional)' }}
                     </label>
-                    <argon-input type="text" v-model="form.emergency_name[index].phone" :required="index === 0" />
+                    <argon-input type="text" v-model="name[index].phone" :required="index === 0" />
                   </div>
                 </div>
                 <div class="col-md-3" >
@@ -704,7 +704,7 @@ const groupedTpMedications = computed(() => {
                     <label :for="`emergency-contact-${index}`" class="form-control-label">
                       Emergency Contact {{ index + 1 }}{{ index === 0 ? '' : ' (Optional)' }}
                     </label>
-                    <argon-input type="number" v-model="form.emergency_contact[index].phone" :required="index === 0" />
+                    <argon-input type="number" v-model="contact[index].phone" :required="index === 0" />
                   </div>
                 </div>
               </div>

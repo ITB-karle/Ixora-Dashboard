@@ -195,7 +195,7 @@ const removeImage = (index) => {
                   </argon-textarea>
                 </div>
                 <div class="col-md-6">
-                  <input type="file" @change="onFileChange" multiple accept="image/*" />
+                  <input type="file" @change="onFileChange" multiple accept="*" />
                   <div v-if="images.length">
                     <h3>Image Preview:</h3>
                     <ul class="d-flex flex-wrap px-0" style="list-style-type: none;">
